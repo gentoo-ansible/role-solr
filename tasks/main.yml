@@ -1,0 +1,33 @@
+---
+- name: check if solr.war is already installed
+  command: "test -e {{ solr_home_dir }}/solr.war"
+  register: _check_result
+  failed_when: false
+  changed_when: false
+
+- include: deploy.yml tags=install
+  when: _check_result.rc != 0
+
+- include: install_libs.yml tags=install
+
+- include: configure.yml tags=config
+
+- name: install demo core
+  copy: >
+    src=demo
+    dest={{ solr_home_dir }}
+    owner={{ solr_user }}
+    group={{ solr_group }}
+    mode=0644
+    directory_mode=0755
+  notify: restart solr
+  when: solr_demo_core | bool
+
+- name: enable and start solr
+  service: >
+    name=solr
+    enabled=true
+    state=started
+  tags: services
+
+- include: check.yml tags=check

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true">
+
+    <contextName>Solr</contextName>
+
+    <property name="logfile" value="${logback.logdir}/solr.log" />
+
+    <appender name="LOGFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logfile}</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>${logfile}-%d{yyyyMMdd}.gz</fileNamePattern>
+            <!-- keep 60 days' worth of history -->
+            <maxHistory>60</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-5level --- %-60.60logger{59} : %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.apache.solr.handler.dataimport.DocBuilder.level" level="ERROR" />
+
+    <logger name="org.apache.solr.handler.dataimport.ThreadedEntityProcessorWrapper.level" level="ERROR" />
+
+    <logger name="org.apache.solr" level="INFO" />
+
+    <root level="ERROR">
+        <appender-ref ref="LOGFILE" />
+    </root>
+
+</configuration>

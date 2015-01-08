@@ -1,0 +1,30 @@
+---
+- name: create directory for additional server libs
+  file: >
+    state=directory
+    path={{ solr_home_dir }}/lib
+    owner=root group=root mode=0755
+
+- name: fetch additional server libs from Maven repository
+  mvn_get: >
+    name={{ item }}
+    dest={{ solr_home_dir }}/lib
+  notify: restart solr
+  with_items: _server_ext_libs
+
+- name: create directory for cores shared libs
+  file: >
+    state=directory
+    path={{ solr_home_dir }}/shared-lib
+    owner={{ solr_user }}
+    group={{ solr_group }}
+    mode=0755
+
+- name: fetch additional cores shared libs from Maven repository
+  mvn_get: >
+    name={{ item }}
+    dest={{ solr_home_dir }}/lib
+    owner={{ solr_user }}
+    group={{ solr_group }}
+  notify: restart solr
+  with_items: solr_shared_libs

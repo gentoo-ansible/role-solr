@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    This is a stripped down config file used for a simple example...
+    It is *not* a good example to work from.
+-->
+<config>
+
+    <!--
+        Controls what version of Lucene various components of Solr adhere to.
+        Generally, you want to use the latest version to get all bug fixes and
+        improvements. It is highly recommended that you fully re-index after
+        changing this setting as it can affect both how text is indexed and
+        queried.
+    -->
+    <luceneMatchVersion>4.10.2</luceneMatchVersion>
+
+    <!--
+        The DirectoryFactory to use for indexes.
+
+        solr.StandardDirectoryFactory is filesystem based and tries to pick the
+        best implementation for the current JVM and platform.
+        solr.NRTCachingDirectoryFactory, the default, wraps
+        solr.StandardDirectoryFactory and caches small files in memory for better
+      NRT performance.
+    -->
+    <directoryFactory name="DirectoryFactory"
+                      class="${solr.directoryFactory:solr.NRTCachingDirectoryFactory}" />
+
+    <!--
+        Data Directory
+
+        Used to specify an alternate directory to hold all index data other than
+        the default ./data under the Solr home. If replication is in use, this
+        should match the replication configuration.
+    -->
+    <dataDir>${solr.core0.data.dir:}</dataDir>
+
+    <schemaFactory class="ClassicIndexSchemaFactory" />
+
+
+    <!-- The default high-performance update handler -->
+    <updateHandler class="solr.DirectUpdateHandler2">
+
+        <!--
+            Enables a transaction log, used for real-time get, durability, and solr
+            cloud replica recovery.
+
+            "dir" - the target directory for transaction logs, defaults to the
+                    solr data directory.
+        -->
+        <updateLog>
+            <str name="dir">${solr.core0.data.dir:}</str>
+        </updateLog>
+
+    </updateHandler>
+
+    <!--
+        Realtime get handler, guaranteed to return the latest stored fields of any
+        document, without the need to commit or open a new searcher. The current
+        implementation relies on the updateLog feature being enabled.
+    -->
+    <requestHandler name="/get" class="solr.RealTimeGetHandler">
+        <lst name="defaults">
+            <str name="omitHeader">true</str>
+        </lst>
+    </requestHandler>
+
+    <!--
+        Solr Replication
+
+        The SolrReplicationHandler supports replicating indexes from a "master"
+        used for indexing and "slaves" used for queries.
+
+        http://wiki.apache.org/solr/SolrReplication
+    -->
+    <requestHandler name="/replication"
+                    startup="lazy"
+                    class="solr.ReplicationHandler" />
+
+    <!--
+        Request Dispatcher
+
+        This section contains instructions for how the SolrDispatchFilter
+        should behave when processing requests for this SolrCore.
+    -->
+    <requestDispatcher handleSelect="false" >
+        <requestParsers enableRemoteStreaming="false"
+                        multipartUploadLimitInKB="2048"
+                        formdataUploadLimitInKB="2048" />
+    </requestDispatcher>
+
+    <requestHandler name="standard"
+                    class="solr.SearchHandler"
+                    default="true" />
+
+    <!--
+        Field Analysis Request Handler
+
+        RequestHandler that provides much the same functionality as
+        analysis.jsp. Provides the ability to specify multiple field
+        types and field names in the same request and outputs
+        index-time and query-time analysis for each of them.
+
+        Request parameters are:
+          analysis.fieldname  - field name whose analyzers are to be used
+          analysis.fieldtype  - field type whose analyzers are to be used
+          analysis.fieldvalue - text for index-time analysis
+          q (or analysis.q)   - text for query time analysis
+          analysis.showmatch  - When set to true and when query analysis is
+              performed, the produced tokens of the field value analysis will be
+              marked as "matched" for every token that is produces by the query
+              analysis.
+    -->
+    <requestHandler name="/analysis/field"
+                    startup="lazy"
+                    class="solr.FieldAnalysisRequestHandler" />
+
+    <!--
+        Update Request Handler
+
+        http://wiki.apache.org/solr/UpdateXmlMessages
+    -->
+    <requestHandler name="/update"
+                    class="solr.UpdateRequestHandler" />
+
+    <!--
+        Admin Handlers
+        This will register all the standard admin RequestHandlers.
+    -->
+    <requestHandler name="/admin/"
+                    class="solr.handler.admin.AdminHandlers" />
+
+    <!-- Ping / Healthcheck -->
+    <requestHandler name="/admin/ping"
+                    class="solr.PingRequestHandler">
+        <lst name="invariants">
+            <str name="q">solrpingquery</str>
+        </lst>
+        <lst name="defaults">
+            <str name="echoParams">all</str>
+        </lst>
+    </requestHandler>
+
+</config>

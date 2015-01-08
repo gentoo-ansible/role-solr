@@ -1,0 +1,30 @@
+---
+- name: create config directory
+  file: >
+    state=directory
+    path={{ solr_conf_dir }}
+    owner={{ solr_user }}
+    group={{ solr_group }}
+    mode=0755
+
+- name: configure solr.xml
+  file: >
+    src=solr.xml
+    dest={{ solr_conf_dir }}/solr.xml
+    owner={{ solr_user }}
+    group={{ solr_group}}
+  notify: restart solr
+
+- name: symlink solr.xml to {{ solr_home_dir }}
+  file: >
+    state=link
+    src={{ solr_conf_dir }}/solr.xml
+    dest={{ solr_home_dir }}/solr.xml
+    force=yes
+
+- name: configure logging
+  copy: >
+    src=logback.xml
+    dest={{ solr_conf_dir }}/logback.xml
+    owner={{ solr_user }}
+    group={{ solr_group }}

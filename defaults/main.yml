@@ -1,0 +1,41 @@
+---
+# Name of this Solr instance.
+solr_name: solr
+
+# Version to install.
+solr_version: 4.10.2
+
+# URL of the distribution package to download.
+solr_pkg_url: "http://mirror.hosting90.cz/apache/lucene/solr/{{ solr_version }}/solr-{{ solr_version }}.tgz"
+
+# List of JARs (Maven coordinates) to put into libs shared across all cores.
+#
+# Example:
+#   solr_shared_libs:
+#     - org.example.solr:solr-shine
+#     - org.example.solr:solr-dark
+solr_shared_libs: []
+
+# Whether to install a demo core.
+solr_demo_core: true
+
+
+# User to run the Solr instance (will be created if not exist).
+solr_user: solr
+
+# Group to run the Solr instance (will be created if not exist).
+solr_group: "{{ solr_user }}"
+
+# Port number to listen on for HTTP.
+solr_server_port: 8983
+
+
+# Path of the Solr home directory in which all core files and WAR file
+# should be stored.
+solr_home_dir: "/opt/{{ solr_name }}"
+
+# Path of the configuration directory.
+solr_conf_dir: "/etc/{{ solr_name }}"
+
+# Path of the logs directory.
+solr_logs_dir: "/var/log/{{ solr_name }}"

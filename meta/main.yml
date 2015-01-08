@@ -1,0 +1,31 @@
+---
+galaxy_info:
+  author: Jakub Jirutka
+  company: CTU in Prague
+  description: Install Apache Solr 4.
+  license: MIT
+  min_ansible_version: 1.6
+  platforms:
+    - name: Gentoo
+  categories:
+    - database:nosql
+    - web
+
+dependencies:
+  - role: jetty-runner
+    name: "{{ solr_name }}"
+    deploy_dir: "{{ solr_home_dir }}"
+    logs_dir: "{{ solr_logs_dir }}"
+    user: "{{ solr_user }}"
+    group: "{{ solr_group }}"
+    server_port: "{{ solr_server_port }}"
+    env_properties:
+      solr.solr.home: "{{ solr_home_dir }}"
+      logback.configurationFile: "{{ solr_conf_dir }}/logback.xml"
+      logback.logdir: "{{ solr_logs_dir }}"
+    server_extra_jars: "{{ solr_home_dir }}/lib"
+    java_heap_size: 128
+    java_perm_size: 64
+    java_opts:
+      - '-XX:+UseG1GC'
+      - '-XX:MaxGCPauseMillis=80'

@@ -1,0 +1,11 @@
+---
+  # required for Ansible uri module
+- name: install httplib2 package
+  portage: package=dev-python/httplib2
+  tags: packages
+
+- name: check if solr is alive
+  uri: >
+    url=http://localhost:{{ solr_server_port }}/admin/cores?action=STATUS&wt=json
+    status_code=200
+    timeout=10
